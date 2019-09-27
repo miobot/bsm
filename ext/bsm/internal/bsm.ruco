@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+token 'HexLit', :custom, "hex hex"
+
+grammar 'Bsm' do
+  maybemany HexLit
+end

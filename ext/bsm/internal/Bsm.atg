@@ -1,0 +1,73 @@
+
+#include <iostream>
+#include <memory>
+#include "Bsm.hpp"
+
+/*
+	WARNING: This file is generated using ruco. Please modify the .ruco file if you wish to change anything
+	https://github.com/davidsiaw/ruco
+*/
+
+COMPILER Bsm
+
+BsmPtr bsm;
+
+CHARACTERS
+	bigletter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".
+	letter       = "abcdefghijklmnopqrstuvwxyz".
+	underscore   = "_".
+	digit        = "0123456789".
+	cr           = '\r'.
+	lf           = '\n'.
+	tab          = '\t'.
+	stringCh     = ANY - '"' - '\\' - cr - lf.
+	charCh       = ANY - '\'' - '\\' - cr - lf.
+	printable    =  '\u0020' .. '\u007e'.
+	hex          = "0123456789abcdef".
+
+TOKENS
+
+
+	customTokenHexLit = hex hex.
+
+PRAGMAS
+	ddtSym    = '$' { digit | letter }. 
+	optionSym = '$' letter { letter } '='
+	            { digit | letter
+	            | '-' | '.' | ':'
+	            }.
+
+
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+
+IGNORE tab + cr + lf
+
+/*-------------------------------------------------------------------------*/
+
+PRODUCTIONS
+
+Bsm = (. bsm = std::make_shared<class Bsm>(); .)
+(. unsigned curline = la->line, curcol = la->col; .)
+(. HexLitPtr hexlit; .)
+(
+	{
+		HexLit<hexlit> (. bsm->hexlits.push_back(hexlit); .)
+	}
+)
+(. bsm->_line = curline; bsm->_col = curcol; .)
+.
+
+HexLit<HexLitPtr& production> = (. production = std::make_shared<class HexLit>(); .)
+(. unsigned curline = la->line, curcol = la->col; .)
+
+(
+	customTokenHexLit (. production->content = t->val; .)
+)
+(. production->_line = curline; production->_col = curcol; .)
+.
+
+
+
+END Bsm.
+
