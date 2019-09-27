@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'bsm/bsm_parse'
+require 'json'
+
+ast = JSON.parse(Bsm::BsmParse::compile_to_ast(ARGF.read))
+
+result = ''
+
+ast['hexlits'].each do |chr|
+  result << chr['_token'].to_i(16)
+end
+
+print result
